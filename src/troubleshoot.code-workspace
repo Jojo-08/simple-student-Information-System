@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "troubleshoot",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"java.project.sourcePaths": [
+			"src"
+		],
+		"java.project.referencedLibraries": [
+			"lib\\flatlaf-3.5.4.jar",
+			"c:\\Users\\gerom\\Documents\\2nd year\\2nd SEM\\CCC151\\troubleshoot\\lib\\flatlaf-3.5.4.jar"
+		],
+		"jdk.runConfig.vmOptions": "--enable-preview --source 21"
+	}
+}
