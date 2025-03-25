@@ -20,7 +20,7 @@ public class StudentDatabase {
         catch (IOException e)
         {
             e.printStackTrace();
-        }
+        }   
     }
 
     public List<Student> readStudents()
@@ -50,12 +50,12 @@ public class StudentDatabase {
         return students;
     }
 
-    public void updateStudent(String id, String firstName, String lastName, String yearLevel, String gender, String programCode) {
+    public void updateStudent(String oldId, String id, String firstName, String lastName, String yearLevel, String gender, String programCode) {
         List<Student> students = readStudents();
     
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile))) {
             for (Student student : students) {
-                if (student.getId().equals(id)) {
+                if (student.getId().equals(oldId)) {
                     bw.write(id + "," + firstName + "," + lastName + "," + yearLevel + "," + gender + "," + programCode);
                 } else {
                     bw.write(student.toString());
@@ -67,6 +67,22 @@ public class StudentDatabase {
         }
     }
     
+    public void updateStudentsProgramCode(String oldProgramCode, String newProgramCode) {
+        List<Student> students = readStudents(); // Fetch all students
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("students.csv"))) {
+            for (Student student : students) {
+                if (student.getProgramCode().equals(oldProgramCode)) {
+                    // Update the program code for the student
+                    student.setProgramCode(newProgramCode);
+                    System.out.println("Updated student program code: " + student.getId() + " to " + newProgramCode); // Debugging
+                }
+                bw.write(student.toString()); // Write student record
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void deleteStudent(String id)
     {
@@ -128,7 +144,7 @@ public class StudentDatabase {
         List<Student> students = readStudents(); 
         for(Student student : students)
         {
-            if(student.getId().equals(Id) || (student.getFirstName().equals(firstName) && student.getLastName().equals(lastName)))
+            if(student.getId().equals(Id) || (student.getFirstName().equalsIgnoreCase(firstName) && student.getLastName().equalsIgnoreCase(lastName)))
             {
                 return true;
             }
