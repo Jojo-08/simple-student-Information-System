@@ -29,10 +29,30 @@ public class Sort {
         colleges.sort(comparator);
     }
 
-
-  
-    //Comparator for sorting students by last name.
-     
+    public static Comparator<Student> byId() {
+        return new Comparator<Student>() {
+            @Override
+            public int compare(Student s1, Student s2) {
+                String id1 = s1.getId();
+                String id2 = s2.getId();
+    
+                // Split the IDs into year and number parts
+                String[] parts1 = id1.split("-");
+                String[] parts2 = id2.split("-");
+    
+                // Compare the year parts
+                int yearComparison = Integer.compare(Integer.parseInt(parts1[0]), Integer.parseInt(parts2[0]));
+                if (yearComparison != 0) {
+                    return yearComparison; // If years are different, return the comparison result
+                }
+    
+                // If years are the same, compare the number parts as integers
+                int numberComparison = Integer.compare(Integer.parseInt(parts1[1]), Integer.parseInt(parts2[1]));
+                return numberComparison; // Return the comparison result for the number parts
+            }
+        };
+    }
+    
     public static Comparator<Student> byLastName() {
         return Comparator.comparing(Student::getLastName);
     }
@@ -49,6 +69,10 @@ public class Sort {
    
     public static Comparator<Student> byYearLevel() {
         return Comparator.comparing(Student::getYearLevel);
+    }
+
+    public static Comparator<Student> byGender() {
+        return Comparator.comparing(Student::getGender);
     }
 
   
@@ -84,7 +108,7 @@ public class Sort {
         return Comparator.comparing(Program::getCollegeCode);
     }
 
-    public static Comparator<College> byCollegeName() {
+    public static Comparator<College> byCollegeName() { 
         return Comparator.comparing(College::getCollegeName);
     }
 
