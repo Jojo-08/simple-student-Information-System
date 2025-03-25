@@ -1,11 +1,12 @@
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
+
 
 public class StudentInfoSysManagementGUI extends JFrame {
     private StudentDatabase studentDB;
@@ -20,9 +21,8 @@ public class StudentInfoSysManagementGUI extends JFrame {
     private DefaultTableModel studentTableModel;
     private DefaultTableModel collegeTableModel;
     private JTextField idField, firstNameField, lastNameField,
-                       yearLevelField, programCodeField, programNameField,
-                       collegeNameField, collegeCodeField, studentSearchField,
-                        programSearchField, collegeSearchField;
+                        programCodeField, programNameField,
+                       studentSearchField, programSearchField, collegeSearchField;
     private JButton okButton, cancelButton, addStudentButton, addProgramButton, studentSearchButton, programSearchButton,
                     collegeSearchButton, addCollegeButton, studentResetButton, programResetButton, collegeResetButton, 
                     sortButton, deleteStudentButton, deleteProgramButton,deleteCollegeButton, confirmDeleteStudentButton, 
@@ -41,13 +41,13 @@ public class StudentInfoSysManagementGUI extends JFrame {
         // Initialize databases
        
         studentDB = new StudentDatabase("students.csv");
-        programDB = new ProgramDatabase("programs.csv");
-        collegeDB = new CollegeDatabase("colleges.csv");
+        programDB = new ProgramDatabase("programs.csv", studentDB);
+        collegeDB = new CollegeDatabase("colleges.csv", studentDB, programDB);
         searchBy = new SearchBy(studentDB, programDB, collegeDB);
 
         // Set up the main frame
         setTitle("Simple Student Management System");
-        setSize(800, 600);
+        setSize(800, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -103,8 +103,16 @@ public class StudentInfoSysManagementGUI extends JFrame {
             }
         };
         studentTable = new JTable(studentTableModel);
-        studentTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
 
+        studentTable.setFont(new Font("Arial", Font.PLAIN, 14)); // Change font and size as needed
+        studentTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16)); // Header font
+
+        studentTable.setRowHeight(30);
+
+        // Disable column reordering
+        studentTable.getTableHeader().setReorderingAllowed(false);
+
+        studentTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         studentSearchField = new JTextField(20);
@@ -116,6 +124,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
                 }
             }
         });
+
         JComboBox<String> searchOptions = new JComboBox<>(new String[]
                                         {"First Name", "Last Name", 
                                         "Program Code", "Student ID", "College"});
@@ -300,7 +309,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
     }
     
      private void sortStudents() {
-        String[] options = {"Sort by Last Name", "Sort by First Name", "Sort by Year Level", "Sort by Program Code","Sort by College"};
+        String[] options = {"Sort by Id","Sort by Last Name", "Sort by First Name","Sort by Gender", "Sort by Year Level", "Sort by Program Code","Sort by College"};
         int choice = JOptionPane.showOptionDialog(this, "Select sorting option:", "Sort Students",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
 
@@ -308,18 +317,24 @@ public class StudentInfoSysManagementGUI extends JFrame {
         List <Program> programs = programDB.readPrograms(); // Fetch the list of programs
         switch (choice) {
             case 0:
-                Sort.sortStudents(students, Sort.byLastName());
+                Sort.sortStudents(students, Sort.byId());
                 break;
             case 1:
-                Sort.sortStudents(students, Sort.byFirstName());
+                Sort.sortStudents(students, Sort.byLastName());
                 break;
             case 2:
-                Sort.sortStudents(students, Sort.byYearLevel());
+                Sort.sortStudents(students, Sort.byFirstName());
                 break;
-            case 3:
-                Sort.sortStudents(students, Sort.StudentbyProgramCode());
+            case 3: 
+                Sort.sortStudents(students, Sort.byGender());
                 break;
             case 4:
+                Sort.sortStudents(students, Sort.byYearLevel());
+                break;
+            case 5:
+                Sort.sortStudents(students, Sort.StudentbyProgramCode());
+                break;
+            case 6:
                 Sort.sortStudents(students, Sort.StudentbyCollegeCode(programDB));
                 break;
             default:
@@ -444,6 +459,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
         // Determine the buttons based on the active tab
         switch (activeTab) {
             case 0: // Student Tab
+                
                 currentEditButton = editStudentButton;
                 currentConfirmEditButton = confirmEditStudentButton;
                 currentCancelButton = editStudentButton;
@@ -513,12 +529,16 @@ public class StudentInfoSysManagementGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
 
         // Input fields
-        JTextField idField = new JTextField( 20);
-        JTextField firstNameField = new JTextField(20);
-        JTextField lastNameField = new JTextField( 20);
-        JTextField yearLevelField = new JTextField(20);
+         idField = new JTextField( 20);
+         firstNameField = new JTextField(20);
+         lastNameField = new JTextField( 20);
+         JComboBox <String> yearLevelBox = new JComboBox<>(new String[]{"1", "2", "3", "4"});
         JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female", "Other"});
-        JTextField programCodeField = new JTextField(20);
+        JComboBox <String> programCodeBox = new JComboBox<>();
+        List<Program> programs = programDB.readPrograms();
+        for (Program program : programs){
+            programCodeBox.addItem(program.getProgramCode());
+        }
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
 
@@ -530,11 +550,11 @@ public class StudentInfoSysManagementGUI extends JFrame {
         gbc.gridx = 0; gbc.gridy = 2; dialog.add(new JLabel("Last Name:"), gbc);
         gbc.gridx = 1; gbc.gridy = 2; dialog.add(lastNameField, gbc);
         gbc.gridx = 0; gbc.gridy = 3; dialog.add(new JLabel("Year Level:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 3; dialog.add(yearLevelField, gbc);
+        gbc.gridx = 1; gbc.gridy = 3; dialog.add(yearLevelBox, gbc);
         gbc.gridx = 0; gbc.gridy = 4; dialog.add(new JLabel("Gender:"), gbc);
         gbc.gridx = 1; gbc.gridy = 4; dialog.add(genderBox, gbc);
         gbc.gridx = 0; gbc.gridy = 5; dialog.add(new JLabel("Program Code:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 5; dialog.add(programCodeField, gbc);
+        gbc.gridx = 1; gbc.gridy = 5; dialog.add(programCodeBox, gbc);
         gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2; dialog.add(okButton, gbc);
         gbc.gridy = 7; dialog.add(cancelButton, gbc);
 
@@ -545,9 +565,9 @@ public class StudentInfoSysManagementGUI extends JFrame {
                 String id = idField.getText();
                 String firstName = firstNameField.getText();
                 String lastName = lastNameField.getText();
-                String yearLevel = yearLevelField.getText();
+                String yearLevel = (String) yearLevelBox.getSelectedItem();
                 String gender = (String) genderBox.getSelectedItem();
-                String programCode = programCodeField.getText();
+                String programCode = (String) programCodeBox.getSelectedItem();
         
                 // Prevent duplicate validation pop-ups
                 if (!studentDB.validateStudentId(id)) {
@@ -565,20 +585,8 @@ public class StudentInfoSysManagementGUI extends JFrame {
                     return;
                 }
         
-                // **Check if Program Exists BEFORE Adding the Student**
-                boolean programExists = programDB.doesProgramExist(programCode);
         
-                if (!programExists) {
-                         JOptionPane.showMessageDialog(dialog,
-                        "The program does not exist in the database. Go to the programs tab and add your new program before proceeding",
-                        "Program Not Found",
-                        JOptionPane.ERROR_MESSAGE);
-                        dialog.dispose();
-                        return;
-                    
-                }
         
-                // **If Program Exists, Create Student**
                 studentDB.createStudent(id, firstName, lastName, yearLevel, gender, programCode);
                 updateStudentTable();
                 dialog.dispose(); // Close the dialog only after validation
@@ -625,10 +633,19 @@ public class StudentInfoSysManagementGUI extends JFrame {
             idField = new JTextField(id, 10);
             firstNameField = new JTextField(firstName, 10);
             lastNameField = new JTextField(lastName, 10);
-            yearLevelField = new JTextField(yearLevel, 10);
+            JComboBox <String> yearLevelBox = new JComboBox<>( new String[]{"1", "2", "3", "4"});
+            yearLevelBox.setSelectedItem(yearLevel);
             JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female", "Other"});
             genderBox.setSelectedItem(gender); 
-            programCodeField = new JTextField(programCode, 10);
+            JComboBox <String> programCodeBox = new JComboBox<>();
+            List<Program> programs = programDB.readPrograms();
+            for(Program program : programs)
+            {
+                programCodeBox.addItem(program.getProgramCode());
+            }
+
+            programCodeBox.setSelectedItem(programCode);
+
             okButton = new JButton("Save");
             cancelButton = new JButton("Cancel");
     
@@ -640,11 +657,11 @@ public class StudentInfoSysManagementGUI extends JFrame {
             gbc.gridx = 0; gbc.gridy = 2; dialog.add(new JLabel("Last Name:"), gbc);
             gbc.gridx = 1; gbc.gridy = 2; dialog.add(lastNameField, gbc);
             gbc.gridx = 0; gbc.gridy = 3; dialog.add(new JLabel("Year Level:"), gbc);
-            gbc.gridx = 1; gbc.gridy = 3; dialog.add(yearLevelField, gbc);
+            gbc.gridx = 1; gbc.gridy = 3; dialog.add(yearLevelBox, gbc);
             gbc.gridx = 0; gbc.gridy = 4; dialog.add(new JLabel("Gender:"), gbc);
             gbc.gridx = 1; gbc.gridy = 4; dialog.add(genderBox, gbc);
             gbc.gridx = 0; gbc.gridy = 5; dialog.add(new JLabel("Program Code:"), gbc);
-            gbc.gridx = 1; gbc.gridy = 5; dialog.add(programCodeField, gbc);
+            gbc.gridx = 1; gbc.gridy = 5; dialog.add(programCodeBox, gbc);
             gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2; dialog.add(okButton, gbc);
             gbc.gridy = 7; dialog.add(cancelButton, gbc);
     
@@ -655,22 +672,45 @@ public class StudentInfoSysManagementGUI extends JFrame {
                     String newId = idField.getText();
                     String newFirstName = firstNameField.getText();
                     String newLastName = lastNameField.getText();
-                    String newYearLevel = yearLevelField.getText();
+                    String newYearLevel = (String) yearLevelBox.getSelectedItem();
                     String newGender = (String) genderBox.getSelectedItem();
-                    String newProgramCode = programCodeField.getText();
-    
+                    String newProgramCode = (String) programCodeBox.getSelectedItem();
+                    StringBuilder message = new StringBuilder();
+
                     if (studentDB.validateStudentId(newId)) {
                         // Update the student in the database
-                        if (!id.equals(newId) || (!firstName.equals(newFirstName) && !lastName.equals(newLastName)) 
-                            && studentDB.doesStudentExist(newId, newFirstName, newLastName))
-                        {
-                            JOptionPane.showMessageDialog(dialog, 
-                            "Cannot change Student! " + newProgramCode + " already exists.", 
-                            "Duplicate Student", 
-                            JOptionPane.WARNING_MESSAGE);
-                        return; // Prevent duplicate code update
+                
+                        System.out.println(id + " == " + newId + " : " + id.equals(newId));
+                        if(!id.equals(newId))
+                        {   
+                                System.out.println("Does ID " + newId + " exist? " + studentDB.doesStudentExist(newId,"",""));
+                                if(studentDB.doesStudentExist(newId, "", ""))
+                                {
+                                    System.out.println("Cannot change ID " + newId);
+                                    message.append("Cannot change ID ").append(newId).append(" already exists. \n ");
+            
+                                }
                         }
-                        studentDB.updateStudent(newId, newFirstName, newLastName, newYearLevel, newGender, newProgramCode);
+
+                        System.out.println(firstName + " == " + newFirstName + " : " + !firstName.equalsIgnoreCase(newFirstName));
+                        System.out.println(lastName + " == " + newLastName + " : " + !lastName.equalsIgnoreCase(newLastName));
+                        if ( !firstName.equalsIgnoreCase(newFirstName) && !lastName.equalsIgnoreCase(newLastName))
+                        {
+                            System.out.println("Does Name " + newFirstName + " " + newLastName + " exist? " + studentDB.doesStudentExist("",newFirstName,newLastName));
+                            if(studentDB.doesStudentExist("", newFirstName, newLastName))
+                            {
+                                System.out.println("Cannot change Name " + newFirstName + " " + newLastName);
+                                message.append("Cannot change Name ").append(newFirstName).append(" ").append(newLastName).append(" already exists. \n ");
+        
+                            }
+                        }
+
+                        if (message.length() > 0) {
+                            JOptionPane.showMessageDialog(dialog, message.toString(), "Validation Error", JOptionPane.WARNING_MESSAGE);
+                            return; // Prevent update if there are validation errors
+                        }       
+
+                        studentDB.updateStudent(id,newId, newFirstName, newLastName, newYearLevel, newGender, newProgramCode);
                         updateStudentTable();
                         dialog.dispose(); // Close the dialog
                     } else {
@@ -722,6 +762,14 @@ public class StudentInfoSysManagementGUI extends JFrame {
             }
         };
         programTable = new JTable(programTableModel);
+
+        programTable.setFont(new Font("Arial", Font.PLAIN, 14)); // Change font and size as needed
+        programTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16)); // Header font
+
+        programTable.setRowHeight(30); 
+
+        // Disable column reordering
+        programTable.getTableHeader().setReorderingAllowed(false);
         programTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
         panel.add(new JScrollPane(programTable), BorderLayout.CENTER);
 
@@ -815,7 +863,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
         });
         confirmEditProgramButton.setVisible(false); // Initially hidden
 
-        // Button to sort students
+        // Button to sort programs
         sortButton = new JButton("Sort Programs");
         sortButton.addActionListener(new ActionListener() {
             @Override
@@ -942,7 +990,13 @@ public class StudentInfoSysManagementGUI extends JFrame {
 
         JTextField programCodeField = new JTextField( 10);
         JTextField programNameField = new JTextField(10);
-        JTextField collegeCodeField = new JTextField(10);
+
+        JComboBox<String> collegeCodeBox = new JComboBox<>();
+        List<College> colleges = collegeDB.readColleges();
+        for(College college : colleges)
+        {
+            collegeCodeBox.addItem(college.getCollegeCode());
+        }
         JButton addButton = new JButton("Add");
         JButton cancelButton = new JButton("Cancel");                            
     
@@ -952,7 +1006,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
         gbc.gridx = 0; gbc.gridy = 1; dialog.add(new JLabel("Program Name:"), gbc);
         gbc.gridx = 1; gbc.gridy = 1; dialog.add(programNameField, gbc);
         gbc.gridx = 0; gbc.gridy = 2; dialog.add(new JLabel("College Code:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 2; dialog.add(collegeCodeField, gbc);
+        gbc.gridx = 1; gbc.gridy = 2; dialog.add(collegeCodeBox, gbc);
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; dialog.add(addButton, gbc);
         gbc.gridy = 4; dialog.add(cancelButton, gbc);
             
@@ -961,27 +1015,18 @@ public class StudentInfoSysManagementGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String newProgramCode = programCodeField.getText();
                 String programName = programNameField.getText();
-                String collegeCode = collegeCodeField.getText();
+                String collegeCode = (String) collegeCodeBox.getSelectedItem();
 
                 // **Check if College Exists**
                 boolean collegeExists = collegeDB.doesCollegeExist(collegeCode);
                
                 if(programDB.doesProgramExist(newProgramCode, programName))
                 {
-                    JOptionPane.showMessageDialog(dialog, "Program " + newProgramCode + " already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(dialog, "Program already exists!", "Error", JOptionPane.ERROR_MESSAGE);
                     dialog.dispose();
                     return;
                 }
                
-                if (!collegeExists) {
-                     JOptionPane.showMessageDialog(dialog,
-                        "The college code does not exist in the database.  Go to the programs tab and add your new program before proceeding",
-                        "College Not Found",
-                        JOptionPane.ERROR_MESSAGE);
-                        dialog.dispose();
-                        return;  
-                    
-                }
         
                 // **If College Exists, Create Program**
                 programDB.createProgram(newProgramCode, programName, collegeCode);
@@ -1027,7 +1072,14 @@ public class StudentInfoSysManagementGUI extends JFrame {
         // Input fields
         programCodeField = new JTextField(programCode, 10);
         programNameField = new JTextField(programName, 10);
-        collegeCodeField = new JTextField(collegeCode, 10);
+
+        JComboBox <String> collegeCodeBox = new JComboBox<>();
+        List<College> colleges = collegeDB.readColleges();
+        for(College college : colleges)
+        {
+            collegeCodeBox.addItem(college.getCollegeCode());
+        }
+        collegeCodeBox.setSelectedItem(collegeCode);
         okButton = new JButton("Save");
         cancelButton = new JButton("Cancel");
 
@@ -1037,7 +1089,7 @@ public class StudentInfoSysManagementGUI extends JFrame {
         gbc.gridx = 0; gbc.gridy = 1; dialog.add(new JLabel("Program Name:"), gbc);
         gbc.gridx = 1; gbc.gridy = 1; dialog.add(programNameField, gbc);
         gbc.gridx = 0; gbc.gridy = 2; dialog.add(new JLabel("College Code:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 2; dialog.add(collegeCodeField, gbc);
+        gbc.gridx = 1; gbc.gridy = 2; dialog.add(collegeCodeBox, gbc);
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2; dialog.add(okButton, gbc);
         gbc.gridy = 4; dialog.add(cancelButton, gbc);
 
@@ -1047,18 +1099,41 @@ public class StudentInfoSysManagementGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String newProgramCode = programCodeField.getText();
                 String newProgramName = programNameField.getText();
-                String newCollegeCode = collegeCodeField.getText();
+                String newCollegeCode = (String) collegeCodeBox.getSelectedItem();
                 
-                if (!programCode.equals(newProgramCode) ||!programName.equals(newProgramName) && programDB.doesProgramExist(newProgramCode, newProgramName)) {
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Cannot change program code! " + newProgramCode + " already exists.", 
-                        "Duplicate program Code", 
-                        JOptionPane.WARNING_MESSAGE);
-                    return; // ❌ Prevent duplicate code update
+                StringBuilder message = new StringBuilder();
+
+                //Check for duplicates if the program code is being changed
+                System.out.println(programCode + " == " + newProgramCode + " : " + programName.equals(newProgramName));
+                if(!programCode.equals(newProgramCode))
+                {
+                    System.out.println("Does code " + newProgramCode + " exist? " + programDB.doesProgramExist(newProgramCode,""));
+                    if(programDB.doesProgramExist(newProgramCode,""))
+                    {
+                        System.out.println("Cannot change code" + newProgramCode);
+                        message.append("Cannot change program code ").append(newProgramCode).append(" already exists. \n ");
+
+                    }
                 }
 
-                    programDB.updateProgram(newProgramCode, newProgramName, newCollegeCode);
+                if(!programName.equalsIgnoreCase(newProgramName))
+                {
+                    System.out.println("Does program" + newProgramName + " exist? " + programDB.doesProgramExist("",newProgramName));
+                    if (programDB.doesProgramExist("",newProgramName))
+                    {
+                        System.out.println("Cannot change name" + newProgramName);
+                        message.append("Cannot change program name! ").append(newProgramName).append(" already exists.\n");
+                    }
+                }
+
+                if (message.length() > 0) {
+                    JOptionPane.showMessageDialog(dialog, message.toString(), "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return; // Prevent update if there are validation errors
+                }
+
+                    programDB.updateProgram(programCode,newProgramCode, newProgramName, newCollegeCode);
                     updateProgramTable();
+                    updateStudentTable();
                     dialog.dispose(); // Close the dialog
                 
             }
@@ -1084,16 +1159,20 @@ public class StudentInfoSysManagementGUI extends JFrame {
             return;
         }
 
-        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected programs?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        int confirmation = JOptionPane.showConfirmDialog(this, "Warning: Deleting this program will also delete all associated students. Do you want to proceed?",
+                             "Confirm Deletion", JOptionPane.YES_NO_OPTION);
         if (confirmation == JOptionPane.YES_OPTION) {
             for (int i = selectedRows.length - 1; i >= 0; i--) {
                 int rowIndex = selectedRows[i];
                 String programCode = (String) programTableModel.getValueAt(rowIndex, 0);
-                programDB.deleteProgram(programCode, false); // Delete from database
+                programDB.deleteProgram(programCode); // Delete from database
                 programTableModel.removeRow(rowIndex); // Remove from table model
             }
         }
-
+        else {
+            System.out.println("Deletion canceled by the user.");
+            return;
+        }
         updateStudentTable();
     }
 
@@ -1109,6 +1188,14 @@ public class StudentInfoSysManagementGUI extends JFrame {
             }
         };
         collegeTable = new JTable(collegeTableModel);
+
+        collegeTable.setFont(new Font("Arial", Font.PLAIN, 14)); // Change font and size as needed
+        collegeTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16)); // Header font
+
+        collegeTable.setRowHeight(30); 
+
+        // Disable column reordering
+        collegeTable.getTableHeader().setReorderingAllowed(false);
         collegeTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION); // Allow multiple selections
         panel.add(new JScrollPane(collegeTable), BorderLayout.CENTER);
           
@@ -1203,6 +1290,13 @@ public class StudentInfoSysManagementGUI extends JFrame {
         });
         confirmEditCollegeButton.setVisible(false); // Initially hidden
 
+        sortButton = new JButton("Sort Colleges");
+        sortButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sortColleges();
+            }
+        });
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addCollegeButton);
@@ -1210,7 +1304,8 @@ public class StudentInfoSysManagementGUI extends JFrame {
         buttonPanel.add(confirmEditCollegeButton);
         buttonPanel.add(deleteCollegeButton);
         buttonPanel.add(confirmDeleteCollegeButton);
-        
+        buttonPanel.add(sortButton);
+
         panel.add(searchPanel, BorderLayout.NORTH);
         panel.add(buttonPanel, BorderLayout.SOUTH);
         
@@ -1374,17 +1469,39 @@ public class StudentInfoSysManagementGUI extends JFrame {
                 String newCollegeName = collegeNameField.getText().trim();
     
                 // **Check if Updating to an Existing College Code**
-                if (!oldCollegeCode.equals(newCollegeCode) || !oldCollegeName.equalsIgnoreCase(newCollegeName) && collegeDB.doesCollegeExist(newCollegeCode)) {
-                    JOptionPane.showMessageDialog(dialog, 
-                        "Cannot change college code! " + newCollegeCode + " already exists.", 
-                        "Duplicate College Code", 
-                        JOptionPane.WARNING_MESSAGE);
-                    return; // ❌ Prevent duplicate code update
+                StringBuilder message = new StringBuilder();
+
+                // Check for duplicates if the college code is being changed
+                System.out.println(oldCollegeCode + " == " + newCollegeCode + " : " + oldCollegeCode.equals(newCollegeCode));
+                if (!oldCollegeCode.equals(newCollegeCode)) {
+                    System.out.println("Does code " + newCollegeCode + " exist? " + collegeDB.doesCollegeExist(newCollegeCode, ""));
+                    if (collegeDB.doesCollegeExist(newCollegeCode, "")) {
+                        System.out.println("Cannot change code " + newCollegeCode);
+                        message.append("Cannot change college code! ").append(newCollegeCode).append(" already exists.\n");
+                    }
+                }
+    
+                // Check for duplicates if the college name is being changed
+                System.out.println(oldCollegeName + " == " + newCollegeName + " : " + oldCollegeName.equals(newCollegeName));
+                if (!oldCollegeName.equalsIgnoreCase(newCollegeName)) {
+                    System.out.println("Does college " + newCollegeName + " exist? " + collegeDB.doesCollegeExist("", newCollegeName));
+                    if (collegeDB.doesCollegeExist("", newCollegeName)) {
+                        System.out.println("Cannot change name " + newCollegeName);
+                        message.append("Cannot change college name! ").append(newCollegeName).append(" already exists.\n");
+                    }
+                }
+
+                // If there are any messages, show a single pop-up
+                if (message.length() > 0) {
+                    JOptionPane.showMessageDialog(dialog, message.toString(), "Validation Error", JOptionPane.WARNING_MESSAGE);
+                    return; // Prevent update if there are validation errors
                 }
     
                 // **Update College**
-                collegeDB.updateCollege(newCollegeCode, newCollegeName);
+                collegeDB.updateCollege(oldCollegeCode, newCollegeCode, newCollegeName);
+                collegeTableModel.fireTableDataChanged();
                 updateCollegeTable();
+                updateProgramTable();
                 dialog.dispose(); // ✅ Close if successful
             }
         });
@@ -1401,6 +1518,32 @@ public class StudentInfoSysManagementGUI extends JFrame {
         dialog.setVisible(true);
     }
     
+    private void sortColleges() {
+        String[] options = {"Sort by College Name", "Sort by College Code"};
+        int choice = JOptionPane.showOptionDialog(this, "Select sorting option:", "Sort Colleges",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+        List<College> colleges = collegeDB.readColleges(); 
+
+        switch (choice) {
+            case 0:
+                Sort.sortColleges(colleges, Sort.byCollegeName());
+                break;
+        
+            case 1:
+                Sort.sortColleges(colleges, Sort.CollegebyCollegeCode());
+                break;
+            
+            default:
+                return; // No sorting if no option is selected
+        }
+
+        // Clear the table and repopulate it with sorted data
+        collegeTableModel.setRowCount(0); // Clear existing rows
+        for (College college : colleges) {
+            collegeTableModel.addRow(new Object[]{college.getCollegeCode(), college.getCollegeName()});
+        }
+    }
 
     private void deleteSelectedColleges() {
         int[] selectedRows = collegeTable.getSelectedRows();
@@ -1409,7 +1552,8 @@ public class StudentInfoSysManagementGUI extends JFrame {
             return;
         }
 
-        int confirmation = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected colleges?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        int confirmation = JOptionPane.showConfirmDialog(this, "Warning: Deleting this college will also delete all associated programs and students. Do you want to proceed?"
+                                                        , "Confirm Deletion", JOptionPane.YES_NO_OPTION);
         if (confirmation == JOptionPane.YES_OPTION) {
             for (int i = selectedRows.length - 1; i >= 0; i--) {
                 int rowIndex = selectedRows[i];
@@ -1417,6 +1561,10 @@ public class StudentInfoSysManagementGUI extends JFrame {
                 collegeDB.deleteCollege(collegeCode); // Delete from database
                 collegeTableModel.removeRow(rowIndex); // Remove from table model
             }
+        }
+        else {
+            // User chose not to proceed with deletion
+            System.out.println("Deletion canceled by the user.");
         }
         // After deleting the college
 
@@ -1436,4 +1584,3 @@ public class StudentInfoSysManagementGUI extends JFrame {
 
 
    
-
