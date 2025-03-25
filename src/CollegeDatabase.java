@@ -1,13 +1,16 @@
 import java.io.*;
 import java.util.*;
-import javax.swing.JOptionPane;
 
 public class CollegeDatabase {
 
     private String csvFile;
+    private StudentDatabase studentDB;
+    private ProgramDatabase programDB;
 
-    public CollegeDatabase(String csvFile)
+    public CollegeDatabase(String csvFile, StudentDatabase studentDB, ProgramDatabase programDB) 
     {
+        this.studentDB =  studentDB;
+        this.programDB = programDB;
         this.csvFile = csvFile;
 
     }
@@ -32,7 +35,7 @@ public class CollegeDatabase {
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println("Raw line from CSV: " + line); // Debugging
+               // System.out.println("Raw line from CSV: " + line); // Debugging
                 
                 //  Split into exactly two parts: College Code & Full College Name
                 String[] parts = line.split(",", 2);
@@ -40,7 +43,7 @@ public class CollegeDatabase {
                 if (parts.length == 2) {
                     String collegeCode = parts[0].trim();
                     String collegeName = parts[1].trim(); // Preserve full name
-                    System.out.println("Parsed College: " + collegeCode + " - " + collegeName); // Debugging
+                   // System.out.println("Parsed College: " + collegeCode + " - " + collegeName); // Debugging
                     colleges.add(new College(collegeCode, collegeName));
                 } else {
                     System.out.println("Invalid line format: " + line);
@@ -55,39 +58,42 @@ public class CollegeDatabase {
     
     
     
-    public void updateCollege(String collegeCode, String collegeName) {
+    public void updateCollege(String oldCollegeCode, String newCollegeCode, String collegeName) {
         List<College> colleges = readColleges();
-
+        boolean updated = false; // Track if an update occurred
+    
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile))) {
             for (College college : colleges) {
-                if (college.getCollegeCode().equals(collegeCode)) {
-                    bw.write(collegeCode + "," + collegeName); // Correct update
+                if (college.getCollegeCode().equals(oldCollegeCode)) {
+                    // Update the college name
+                    bw.write(newCollegeCode + "," + collegeName); // Write updated college
+                    updated = true; // Mark as updated
+                   
+                    System.out.println("Updated college: " + newCollegeCode + " - " + collegeName); // Debugging
+               
+                    programDB.updateProgramsCollegeCode(oldCollegeCode, newCollegeCode);
                 } else {
-                    bw.write(college.toString());
+                    bw.write(college.toString()); // Write existing college
                 }
                 bw.newLine();
+            }
+            
+            if (!updated) {
+                System.out.println("No college found with code: " + newCollegeCode); // Debugging
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
-    public void deleteCollege(String collegeCode) {
-        // Show a confirmation dialog to the user for college deletion
-        int confirmation = JOptionPane.showConfirmDialog(null, 
-            "Warning: Deleting this college will also delete all associated programs and students. Do you want to proceed?", 
-            "Confirm Deletion", 
-            JOptionPane.YES_NO_OPTION);
-        
-        if (confirmation == JOptionPane.YES_OPTION) {
-            // First, delete all programs associated with the college without showing another dialog
-            ProgramDatabase programDB = new ProgramDatabase("programs.csv");
+    public void deleteCollege(String collegeCode) {      
+             programDB = new ProgramDatabase("programs.csv", studentDB);
             List<Program> programs = programDB.readPrograms();
             
             for (Program program : programs) {
                 if (program.getCollegeCode().equals(collegeCode)) {
-                    // Call deleteProgram with true to skip the confirmation dialog
-                    programDB.deleteProgram(program.getProgramCode(), true); // Delete the program
+                    
+                    programDB.deleteProgram(program.getProgramCode()); // Delete the program
                 }
             }
     
@@ -103,11 +109,8 @@ public class CollegeDatabase {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            // User chose not to proceed with deletion
-            System.out.println("Deletion canceled by the user.");
-        }
-    }
+        } 
+    
     
     public boolean doesCollegeExist(String collegeCode, String collegeName) {
         List<College> colleges = readColleges(); // Fetch all colleges
