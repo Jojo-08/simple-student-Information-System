@@ -1,5 +1,12 @@
-BS STAT,Statistics,CSM
-BSA,Accountancy,CEBA
-BSN,Nursing,CHS
-BSCS,Computer Science,CCS
-BSIT,Information Technology,CCS
+BSCS,Bachelor of Science in Computer Science,CCS
+BSIT,Bachelor of Science in Information Technology,CCS
+BSN,Bachelor of Science in Nursing,CHS
+BSIS,Bachelor of Science in Information Systems,CCS
+BSCA,Bachelor of Science in Computer Applications,CCS
+BSPEd,Bachelor of Science in Physical Education,CED
+BS STAT,Bachelor of Science in Statistics,CSM
+BSA,Bachelor of Science in Accountancy,CEBA
+BSChE,Bachelor of Science in Chemical Engineering,COE
+BSCE,Bachelor of Science in Civil Engineering,COE
+BSEd,Bachelor of Science in Secondary Education,CED
+BAELS,Bachelor of Arts in English Language Studies,CASS

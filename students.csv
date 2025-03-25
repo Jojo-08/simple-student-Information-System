@@ -1,3 +1,100 @@
-2023-0001,Mycaella Shane,Remolador,2,Female,BSN
-2023-0238,Johann Sebastian,Geromo,2,Male,BSCS
-2023-0446,Rossmir Adrian,Wong,2,Male,BSIT
+2021-0001,Mary,Young,3,Male,BSIT
+2022-0002,Gregory,Roberts,1,Other,BSIT
+2020-0003,Brendan,Jensen,1,Male,BSA
+2025-0004,Michael,Ray,3,Female,BSCE
+2024-0155,Catherine,Hernandez,3,Female,BSEd
+2021-0006,Sherri,Hoffman,3,Female,BAELS
+2020-0007,Jennifer,Weber,2,Female,BSEd
+2024-0008,Katherine,Martin,4,Male,BSChE
+2024-0009,Heather,Bates,4,Other,BSIT
+2020-0010,Karen,Day,2,Female,BSCA
+2020-0011,Timothy,Sanchez,1,Male,BSCE
+2021-0012,Paul,Sanchez,1,Other,BAELS
+2021-0013,Bailey,Baker,4,Male,BSEd
+2023-0014,Christine,Jones,2,Female,BSA
+2025-0015,Eric,Kaiser,3,Male,BS STAT
+2024-0016,Malik,Haley,3,Other,BAELS
+2022-0017,Stephanie,Smith,4,Other,BSA
+2020-0018,Belinda,Lucero,2,Other,BSIT
+2024-0019,Erik,Wells,1,Male,BS STAT
+2022-0020,Heidi,Carter,4,Male,BSCA
+2025-0021,Michaela,Vasquez,1,Female,BSCA
+2021-0022,April,Cox,1,Male,BSChE
+2022-0023,Darrell,Keller,3,Male,BSEd
+2023-0024,Mark,Taylor,3,Male,BSEd
+2023-0025,Michael,Thomas,3,Female,BSIS
+2025-0026,Nicole,Hooper,4,Female,BSA
+2025-0027,Devin,Harrison,1,Other,BS STAT
+2022-0028,Phillip,Robinson,3,Other,BSIT
+2020-0029,Ryan,Simmons,1,Female,BAELS
+2025-0030,Abigail,Adams,4,Other,BSCE
+2023-0031,John,Pratt,3,Female,BSN
+2020-0032,Leonard,Williams,1,Female,BSIT
+2021-0033,Nathaniel,Ruiz,2,Other,BSIS
+2023-0034,Randall,Garcia,4,Male,BSChE
+2020-0035,April,Wise,1,Female,BSIT
+2024-0036,Jenna,Walsh,2,Male,BSA
+2023-0037,David,Patrick,1,Other,BAELS
+2020-0038,Adam,Snow,4,Male,BSA
+2022-0039,Patricia,White,4,Male,BSChE
+2024-0040,Madison,Flores,3,Female,BSEd
+2021-0041,Benjamin,Henry,4,Male,BSIT
+2024-0042,Emma,Gaines,2,Female,BSEd
+2024-0043,Kimberly,Brown,3,Male,BSPEd
+2020-0044,Rick,Ramirez,4,Female,BSCA
+2024-0045,James,Scott,4,Female,BSCA
+2021-0046,Mark,Duke,1,Female,BS STAT
+2022-0047,Joy,Austin,2,Female,BSCE
+2025-0048,Chase,Tucker,1,Other,BSCA
+2024-0049,Monique,Hernandez,4,Male,BSN
+2021-0050,Ebony,Campbell,1,Female,BSIS
+2022-0051,Michael,Garrett,2,Female,BSPEd
+2024-0052,Hannah,Lee,2,Female,BSCE
+2022-0053,Sydney,Simmons,2,Male,BAELS
+2025-0054,Jennifer,King,3,Other,BSIS
+2021-0055,Timothy,Mccann,2,Other,BAELS
+2022-0056,Alexander,Lewis,4,Female,BSEd
+2022-0057,Curtis,Young,1,Male,BSIT
+2025-0058,Brendan,Vega,2,Male,BSN
+2023-0059,Cynthia,Obrien,3,Other,BSChE
+2021-0060,Amy,Wiley,4,Other,BSPEd
+2025-0061,Shannon,Mcgee,4,Male,BSChE
+2024-0062,Andrew,Wilcox,3,Other,BSCE
+2022-0063,Stephanie,Jensen,1,Other,BSIS
+2021-0064,Hailey,Harris,2,Male,BSA
+2022-0065,Jeffrey,Phelps,2,Female,BS STAT
+2025-0066,Kimberly,Arnold,1,Other,BSN
+2025-0067,Nathan,Liu,3,Male,BSEd
+2025-0068,Joshua,Williams,3,Male,BSIT
+2025-0069,Monica,Hall,3,Male,BSA
+2022-0070,Tracy,Gomez,1,Male,BSIT
+2025-0071,Jessica,Drake,3,Male,BSIT
+2024-0072,Katherine,Davis,4,Female,BSChE
+2020-0073,Rebecca,Williams,3,Female,BSPEd
+2024-0074,Adam,Carpenter,2,Female,BSCE
+2022-0075,Charlene,Stevenson,4,Male,BSChE
+2021-0076,Glen,Li,3,Female,BS STAT
+2021-0077,Janet,Beasley,1,Male,BAELS
+2021-0078,Isaac,Vazquez,2,Male,BSIT
+2023-0079,Alexandra,Shaw,1,Other,BS STAT
+2023-0080,Gregory,Clark,2,Male,BAELS
+2025-0081,James,Mack,2,Male,BSChE
+2023-0082,Jared,Taylor,3,Other,BSIT
+2021-0083,Margaret,Perez,4,Other,BSChE
+2024-0084,Nicholas,Rich,1,Male,BSPEd
+2021-0085,Ronald,Frazier,1,Male,BS STAT
+2020-0086,Jessica,Chan,2,Other,BSPEd
+2024-0087,Kara,Johnson,4,Male,BSN
+2020-0088,David,Wilson,2,Other,BSCA
+2023-0089,Jimmy,Giles,2,Male,BS STAT
+2025-0090,Jennifer,Stanley,3,Male,BS STAT
+2025-0091,Robert,Cohen,3,Other,BS STAT
+2022-0092,Roberto,Wolfe,1,Other,BS STAT
+2020-0093,Erik,Garza,2,Male,BSIS
+2023-0094,Nicholas,Walters,1,Female,BSA
+2022-0095,Daniel,Barnett,1,Female,BSIS
+2020-0096,David,Clark,1,Other,BSEd
+2022-0097,Sherri,Lee,1,Male,BSN
+2025-0098,Rachel,Collins,2,Female,BSPEd
+2025-0099,Amber,Gomez,2,Female,BSPEd
+2024-0100,Michelle,Smith,4,Female,BSEd
