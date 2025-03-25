@@ -1,13 +1,14 @@
 import java.io.*;
 import java.util.*;
-import javax.swing.JOptionPane;
 
 public class ProgramDatabase {
 
     private String csvFile;
+    private StudentDatabase studentDB;
 
-    public ProgramDatabase(String csvFile)
-    {
+    public ProgramDatabase(String csvFile, StudentDatabase studentDB)
+    {   
+        this.studentDB = studentDB;
         this.csvFile = csvFile;
     }
 
@@ -22,19 +23,55 @@ public class ProgramDatabase {
         }
     }
     
-    public void updateProgram(String programCode, String programName, String collegeCode) {
+    public void updateProgram(String oldProgramCode, String newProgramCode, String programName, String collegeCode) {
         List<Program> programs = readPrograms();
+        boolean updated = false; // Track if an update occurred
     
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile))) {
             for (Program program : programs) {
-                if (program.getProgramCode().equals(programCode)) {
-                    bw.write(programCode + "," + programName + "," + collegeCode);
+                if (program.getProgramCode().equals(oldProgramCode)) {
+                    // Update the program name and code
+                    bw.write(newProgramCode + "," + programName + "," + collegeCode); // Write updated program
+                    updated = true; // Mark as updated
+                    System.out.println("Updated program: " + newProgramCode + " - " + programName); // Debugging
+                    
+                    // Update corresponding students
+                    studentDB.updateStudentsProgramCode(oldProgramCode, newProgramCode);
                 } else {
-                    bw.write(program.toString());
+                    bw.write(program.toString()); // Write existing program
                 }
                 bw.newLine();
             }
+            
+            if (!updated) {
+                System.out.println("No program found with code: " + oldProgramCode); // Debugging
+            }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateProgramsCollegeCode(String oldCollegeCode, String newCollegeCode)
+    {
+        List<Program> programs = readPrograms();
+
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile)))
+        {
+            for( Program program : programs)
+            {
+                if(program.getCollegeCode().equals(oldCollegeCode))
+                {
+                    program.setCollegeCode(newCollegeCode);
+                    //System.out.println("Updated the program " + program.getProgramName() + " College Code: " + oldCollegeCode + " to " + newCollegeCode);
+                }
+                bw.write(program.toString());
+                bw.newLine();
+
+            }
+            
+        }
+        catch(IOException e)
+        {
             e.printStackTrace();
         }
     }
@@ -77,28 +114,15 @@ public class ProgramDatabase {
         return null; // or throw an exception if the program code is not found
     }
 
-    public void deleteProgram(String programCode, boolean fromCollegeDeletion) {
-        // If not called from college deletion, show a confirmation dialog
-        if (!fromCollegeDeletion) {
-            int confirmation = JOptionPane.showConfirmDialog(null, 
-                "Warning: Deleting this program will also delete all associated students. Do you want to proceed?", 
-                "Confirm Deletion", 
-                JOptionPane.YES_NO_OPTION);
-            
-            if (confirmation != JOptionPane.YES_OPTION) {
-                // User chose not to proceed with deletion
-                System.out.println("Deletion canceled by the user.");
-                return;
-            }
-        }
-    
+    public void deleteProgram(String programCode) {
+        
         // First, delete all students associated with the program
         StudentDatabase studentDB = new StudentDatabase("students.csv");
         List<Student> students = studentDB.readStudents();
         
         for (Student student : students) {
             if (student.getProgramCode().equals(programCode)) {
-                studentDB.deleteStudent(student.getId()); // Delete the student
+                studentDB.updateStudentsProgramCode(programCode, "Unenrolled"); // Delete the student
             }
         }
     
