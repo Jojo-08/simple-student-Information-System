@@ -45,6 +45,11 @@ public class Student {
         return programCode;
     }
 
+    public void setProgramCode(String programCode)
+    {
+        this.programCode = programCode;
+    }
+    
     @Override
     public String toString()
     {
