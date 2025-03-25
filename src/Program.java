@@ -25,6 +25,11 @@ public class Program {
         return collegeCode;
     }
 
+    public void setCollegeCode(String collegeCode)
+    {
+        this.collegeCode = collegeCode;
+    }
+
     @Override
 public String toString() {
     return programCode + "," + programName + "," + collegeCode;
